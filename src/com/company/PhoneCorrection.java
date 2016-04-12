@@ -18,43 +18,32 @@ public class PhoneCorrection {
     String gr2 = "((\\d\\s*\\d\\s*\\d){1})"; //gr3, 4
     String gr3 = "(\\s*(\\-*|\\)*)\\s*)"; //gr 5, 6
     String gr4 = "((\\d\\s*\\d){1})";//gr 7,8
-    private String regEx = "\\+*" + gr1 +"\\d*"+gr1 + gr2 + gr3 + gr1+ gr2 +gr3 + gr1 +gr4 + gr3+ gr1 + gr4;
-
-    String reg = "(\\+*((\\(*|\\-*)\\s*)\\d?(\\s*(\\(*|\\-*)\\s*)" +
-            "((\\d\\s*\\d\\s*\\d){1})(\\s*(\\)*|\\-*)\\s*)(\\s*(\\(*|\\-*)\\s*)" +
-            "((\\d\\s*\\d\\s*\\d){1})(\\s*(\\)*|\\-*)\\s*)(\\s*(\\(*|\\-*)\\s*)" +
-            "((\\d\\s*\\d){1})(\\s*(\\-*|\\)*)\\s*)(\\s*(\\(*|\\-*)\\s*)((\\d\\s*\\d){1}))";
+    private String regEx = "\\+*" + gr1 +"\\d"+gr1 + gr2 + gr3 + gr1+ gr2 +gr3 + gr1 +gr4 + gr3+ gr1 + gr4;
     public PhoneCorrection(String _fileNameIn, String _fileNameOut){
         this.fileNameIn = _fileNameIn;
         this.fileNameOut = _fileNameOut;
         try {
-            //in = new BufferedInputStream(new FileInputStream(fileNameIn));
-            //out = new BufferedOutputStream(new FileOutputStream(fileNameOut));
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileNameIn)));
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileNameIn)));
-            System.out.println("3453");
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileNameOut)));
 
         }catch (IOException e){
             System.out.println(e.getMessage());
         }
     }
     public void correctNumbers(int countryCode)throws IOException{
-        System.out.println("met2");
         Pattern pat =Pattern.compile(regEx);
         Matcher mat;
-        String number, whole;
+        String number = "", whole;
         while(reader.read() != -1){
-            System.out.println("met3");
             whole = reader.readLine();
             System.out.println("whole1 " + whole);
             mat = pat.matcher(whole);
             while(mat.find()){
                 number = whole.substring(mat.start(), mat.end());
-                System.out.println("number1 " + number);
-                whole.replace(number, changeNumber(countryCode, number));
-                System.out.println("whole2 " + whole);
-                writer.write(whole);
+                System.out.println("n1 " + number);
+                whole = whole.replace(number, changeNumber(countryCode, number));
             }
+            writer.write(whole + "\n");
 
 
         }
@@ -62,11 +51,13 @@ public class PhoneCorrection {
         writer.close();
     }
     public String changeNumber(int countryCode, String number){
-
-        number.replaceAll("\\s+","");
-        number.replaceAll("\\(+","");
-        number.replaceAll("\\)+","");
-        number.replaceAll("\\-+","");
+        number = number.replaceAll("\\s","");
+        number = number.replaceAll("\\(","");
+        number = number.replaceAll("\\)","");
+        number = number.replaceAll("-","");
+        number = number.replaceAll("\\+","");
+        number = number.substring(1);
+        System.out.println("number2 "+number);
 
         Pattern pat;
         Matcher mat;
@@ -74,23 +65,40 @@ public class PhoneCorrection {
 
         pat =Pattern.compile("(\\d\\d\\d){1}");
         mat = pat.matcher(number);
-        correctNumber += "(" + mat.start() + mat.end() + ") ";
-        number = number.substring(mat.end());
+        int count = 0;
+        while (mat.find() && count <1) {
+            correctNumber += "(" + mat.group() + ") ";
+            number = number.substring(mat.end());
+            count++;
+        }
 
         pat =Pattern.compile("(\\d\\d\\d){1}");
         mat = pat.matcher(number);
-        correctNumber += mat.start() + mat.end() + "-";
-        number = number.substring(mat.end());
+        count = 0;
+        while(mat.find() && count <1) {
+            correctNumber += mat.group() + "-";
+            number = number.substring(mat.end());
+            count++;
+        }
 
         pat =Pattern.compile("(\\d\\d){1}");
         mat = pat.matcher(number);
-        correctNumber += mat.start() + mat.end() + "-";
-        number = number.substring(mat.end());
+        count = 0;
+        while(mat.find() && count <1) {
+            correctNumber += mat.group() + "-";
+            number = number.substring(mat.end());
+            count++;
+        }
+
 
         pat =Pattern.compile("(\\d\\d){1}");
         mat = pat.matcher(number);
-        correctNumber += mat.start() + mat.end();
-        System.out.println("correctNumber " + correctNumber);
+        count = 0;
+        while (mat.find()&& count <1) {
+            correctNumber += mat.group();
+            count++;
+        }
+        System.out.println("correctNumber2 " + correctNumber);
 
 
         return correctNumber;
