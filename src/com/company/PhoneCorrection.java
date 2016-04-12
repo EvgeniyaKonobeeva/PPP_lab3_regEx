@@ -33,13 +33,13 @@ public class PhoneCorrection {
     public void correctNumbers(int countryCode)throws IOException{
         Pattern pat =Pattern.compile(regEx);
         Matcher mat;
-        String number = "", whole;
+        String number, whole;
         while(reader.read() != -1){
             whole = reader.readLine();
             System.out.println("whole1 " + whole);
             mat = pat.matcher(whole);
             while(mat.find()){
-                number = whole.substring(mat.start(), mat.end());
+                number = mat.group();
                 System.out.println("n1 " + number);
                 whole = whole.replace(number, changeNumber(countryCode, number));
             }
@@ -61,13 +61,13 @@ public class PhoneCorrection {
 
         Pattern pat;
         Matcher mat;
-        String correctNumber = "+" + countryCode;
+        String correctNumber = " +" + countryCode;
 
         pat =Pattern.compile("(\\d\\d\\d){1}");
         mat = pat.matcher(number);
         int count = 0;
         while (mat.find() && count <1) {
-            correctNumber += "(" + mat.group() + ") ";
+            correctNumber += "(" + mat.group() + ")";
             number = number.substring(mat.end());
             count++;
         }
