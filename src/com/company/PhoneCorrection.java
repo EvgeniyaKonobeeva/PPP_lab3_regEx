@@ -28,29 +28,38 @@ public class PhoneCorrection {
         this.fileNameIn = _fileNameIn;
         this.fileNameOut = _fileNameOut;
         try {
-            in = new BufferedInputStream(new FileInputStream(fileNameIn));
-            out = new BufferedOutputStream(new FileOutputStream(fileNameOut));
+            //in = new BufferedInputStream(new FileInputStream(fileNameIn));
+            //out = new BufferedOutputStream(new FileOutputStream(fileNameOut));
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileNameIn)));
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileNameIn)));
-
+            System.out.println("3453");
 
         }catch (IOException e){
             System.out.println(e.getMessage());
         }
     }
     public void correctNumbers(int countryCode)throws IOException{
+        System.out.println("met2");
         Pattern pat =Pattern.compile(regEx);
         Matcher mat;
         String number, whole;
         while(reader.read() != -1){
+            System.out.println("met3");
             whole = reader.readLine();
+            System.out.println("whole1 " + whole);
             mat = pat.matcher(whole);
             while(mat.find()){
                 number = whole.substring(mat.start(), mat.end());
+                System.out.println("number1 " + number);
                 whole.replace(number, changeNumber(countryCode, number));
+                System.out.println("whole2 " + whole);
+                writer.write(whole);
             }
 
+
         }
+        reader.close();
+        writer.close();
     }
     public String changeNumber(int countryCode, String number){
 
@@ -59,8 +68,8 @@ public class PhoneCorrection {
         number.replaceAll("\\)+","");
         number.replaceAll("\\-+","");
 
-        Pattern pat = Pattern.compile("\\d{1}");
-        Matcher mat = pat.matcher(number);
+        Pattern pat;
+        Matcher mat;
         String correctNumber = "+" + countryCode;
 
         pat =Pattern.compile("(\\d\\d\\d){1}");
@@ -81,6 +90,7 @@ public class PhoneCorrection {
         pat =Pattern.compile("(\\d\\d){1}");
         mat = pat.matcher(number);
         correctNumber += mat.start() + mat.end();
+        System.out.println("correctNumber " + correctNumber);
 
 
         return correctNumber;
