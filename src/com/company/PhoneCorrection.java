@@ -38,20 +38,52 @@ public class PhoneCorrection {
             System.out.println(e.getMessage());
         }
     }
-    public void CorrectNumbers(int CountryCode)throws IOException{
+    public void correctNumbers(int countryCode)throws IOException{
         Pattern pat =Pattern.compile(regEx);
         Matcher mat;
-        String before, number, after, whole;
+        String number, whole;
         while(reader.read() != -1){
             whole = reader.readLine();
             mat = pat.matcher(whole);
             while(mat.find()){
-                before = whole.substring(0,mat.start());
                 number = whole.substring(mat.start(), mat.end());
-
-                after = whole.substring(mat.end());
+                whole.replace(number, changeNumber(countryCode, number));
             }
+
         }
     }
+    public String changeNumber(int countryCode, String number){
 
-}
+        number.replaceAll("\\s+","");
+        number.replaceAll("\\(+","");
+        number.replaceAll("\\)+","");
+        number.replaceAll("\\-+","");
+
+        Pattern pat = Pattern.compile("\\d{1}");
+        Matcher mat = pat.matcher(number);
+        String correctNumber = "+" + countryCode;
+
+        pat =Pattern.compile("(\\d\\d\\d){1}");
+        mat = pat.matcher(number);
+        correctNumber += "(" + mat.start() + mat.end() + ") ";
+        number = number.substring(mat.end());
+
+        pat =Pattern.compile("(\\d\\d\\d){1}");
+        mat = pat.matcher(number);
+        correctNumber += mat.start() + mat.end() + "-";
+        number = number.substring(mat.end());
+
+        pat =Pattern.compile("(\\d\\d){1}");
+        mat = pat.matcher(number);
+        correctNumber += mat.start() + mat.end() + "-";
+        number = number.substring(mat.end());
+
+        pat =Pattern.compile("(\\d\\d){1}");
+        mat = pat.matcher(number);
+        correctNumber += mat.start() + mat.end();
+
+
+        return correctNumber;
+    }
+
+    }
